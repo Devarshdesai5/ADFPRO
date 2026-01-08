@@ -1,0 +1,9 @@
+{
+	"name": "pocDataFactory1310",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "b152285b-55bb-4290-a4e4-664be3a39e57",
+		"tenantId": "8830f4a6-0fec-4a81-8ccb-3dc45776aa3c"
+	}
+}
