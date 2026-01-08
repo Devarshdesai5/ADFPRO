@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "pocDataFactory1310"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"ls_Database_password": {
+			"value": ""
+		},
+		"RestService1_properties_typeProperties_url": {
+			"value": "https://pokeapi.co/api/v2/pokemon"
+		},
+		"ls_Database_properties_typeProperties_server": {
+			"value": "pocserver1009.database.windows.net"
+		},
+		"ls_Database_properties_typeProperties_database": {
+			"value": "Devarsh1310"
+		},
+		"ls_Database_properties_typeProperties_userName": {
+			"value": "Devarsh"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
