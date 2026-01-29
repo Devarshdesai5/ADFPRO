@@ -825,6 +825,65 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Netsuite_Data_Load_SQL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Upsert_NS_Transaction_Union",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "ls_Database",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "DECLARE @json NVARCHAR(MAX);\n\n-- JSON passed from ADF pipeline parameter\nSET @json = N'@{pipeline().parameters.dataarray}';\n\nMERGE dbo.POC_NS_Transaction AS tgt\nUSING (\n    SELECT\n        tl_uniquekey,\n        t_id,\n        t_status,\n        TRY_CONVERT(DECIMAL(18,4), NULLIF(tl_netamount,'')) AS tl_netamount,\n        COALESCE(is_deleted,0) AS is_deleted\n    FROM OPENJSON(@json)\n    WITH (\n        tl_uniquekey BIGINT '$.tl_uniquekey',\n        t_id BIGINT '$.t_id',\n        t_status NVARCHAR(20) '$.t_status',\n        tl_netamount NVARCHAR(50) '$.tl_netamount',\n        is_deleted BIT '$.is_deleted'\n    )\n) src\nON tgt.tl_uniquekey = src.tl_uniquekey\n\nWHEN MATCHED THEN\nUPDATE SET\n    tgt.t_id         = src.t_id,\n    tgt.t_status     = src.t_status,\n    tgt.tl_netamount = src.tl_netamount,\n    tgt.is_deleted   = src.is_deleted,\n    tgt.updated_at   = SYSUTCDATETIME()\n\nWHEN NOT MATCHED BY TARGET THEN\nINSERT (\n    tl_uniquekey,\n    t_id,\n    t_status,\n    tl_netamount,\n    is_deleted,\n    created_at,\n    updated_at\n)\nVALUES (\n    src.tl_uniquekey,\n    src.t_id,\n    src.t_status,\n    src.tl_netamount,\n    src.is_deleted,\n    SYSUTCDATETIME(),\n    SYSUTCDATETIME()\n);\n",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"dataarray": {
+						"type": "string",
+						"defaultValue": [
+							{
+								"tl_uniquekey": 1,
+								"t_id": 100,
+								"t_status": "OPEN",
+								"tl_netamount": "250.75",
+								"is_deleted": 0
+							}
+						]
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_Database')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/RESTAPI')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
